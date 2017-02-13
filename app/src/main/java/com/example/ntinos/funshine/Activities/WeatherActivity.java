@@ -1,4 +1,4 @@
-package com.example.ntinos.funshine;
+package com.example.ntinos.funshine.Activities;
 
 import android.*;
 import android.Manifest;
@@ -19,13 +19,19 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.ntinos.funshine.*;
+import com.example.ntinos.funshine.model.DailyWeatherReport;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
 
@@ -37,10 +43,12 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     private GoogleApiClient mGoogleApiClient;
     final int PERMISSION_LOCATION = 111;
 
+    ArrayList<DailyWeatherReport> dailyReport = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weather);
+        setContentView(com.example.ntinos.funshine.R.layout.activity_weather);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -58,7 +66,34 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
-                Log.v("FUN", "RES: " + response.toString());
+                try {
+                    JSONObject city = response.getJSONObject("city");
+                    String cityName = city.getString("name");
+                    String country = city.getString("country");
+
+                    JSONArray list = response.getJSONArray("list");
+
+                    for(int i=0; i<5; i++){
+                        JSONObject obj = list.getJSONObject(i);
+                        JSONObject main = obj.getJSONObject("main");
+                        Double currentTemp = main.getDouble("temp");
+                        Double maxTemp = main.getDouble("temp_max");
+                        Double minTemp = main.getDouble("temp_min");
+
+                        JSONArray weatherArr = obj.getJSONArray("weather");
+                        JSONObject weather = weatherArr.getJSONObject(0);
+                        String weatherType = weather.getString("main");
+
+                        String rawDate = obj.getString("dt_txt");
+
+                        DailyWeatherReport report = new DailyWeatherReport(country, cityName, rawDate, maxTemp.intValue(), minTemp.intValue(), currentTemp.intValue(), weatherType);
+                        Log.v("JSON","Weather: " + report.getWeatherType());
+                        dailyReport.add(report);
+                    }
+
+                }catch (JSONException e){
+                    Log.v("JSONError","Error: " + e.getLocalizedMessage());
+                }
             }
         }, new Response.ErrorListener(){
             @Override
