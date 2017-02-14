@@ -5,6 +5,12 @@ package com.example.ntinos.funshine.model;
  */
 
 public class DailyWeatherReport {
+    public static final String WEATHER_TYPE_CLOUDS = "Clouds";
+    public static final String WEATHER_TYPE_CLEAR = "Clear";
+    public static final String WEATHER_TYPE_RAIN = "Rain";
+    public static final String WEATHER_TYPE_SNOW = "Snow";
+    public static final String WEATHER_TYPE_WIND = "Wind";
+
     private String cityName;
     private String country;
     private String convertedDate;
@@ -14,9 +20,54 @@ public class DailyWeatherReport {
     private String weatherType;
 
     public String convertDate (String date){
-        String convertedDate = "1 May";
+        String convertedDate;
+        String[] parts = date.split(" ");
+        String[] splitedDate = parts[0].split("-");
+        String[] splitedTime = parts[1].split(":");
+        String day = splitedDate[2];
+        String month = splitedDate[1];
 
-        //TODO convert the initial date
+        switch (month){
+            case "01":
+                month = "January";
+                break;
+            case "02":
+                month = "February";
+                break;
+            case "03":
+                month = "March";
+                break;
+            case "04":
+                month = "April";
+                break;
+            case "05":
+                month = "May";
+                break;
+            case "06":
+                month = "June";
+                break;
+            case "07":
+                month = "Jule";
+                break;
+            case "08":
+                month = "August";
+                break;
+            case "09":
+                month = "September";
+                break;
+            case "10":
+                month = "October";
+                break;
+            case "11":
+                month = "November";
+                break;
+            default:
+                month = "December";
+                break;
+        }
+
+        convertedDate = day + " " + month + "   " + splitedTime[0] + ":00";
+
         return convertedDate;
     }
 
@@ -56,5 +107,10 @@ public class DailyWeatherReport {
 
     public String getWeatherType() {
         return weatherType;
+    }
+
+    public String getDay(){
+        String[] date = convertedDate.split(" ");
+        return date[0] + " " + date[1];
     }
 }
