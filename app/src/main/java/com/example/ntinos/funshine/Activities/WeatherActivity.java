@@ -1,6 +1,5 @@
 package com.example.ntinos.funshine.Activities;
 
-import android.*;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,24 +9,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.ntinos.funshine.*;
+import com.example.ntinos.funshine.Controllers.WeatherAdapter;
 import com.example.ntinos.funshine.R;
 import com.example.ntinos.funshine.model.DailyWeatherReport;
 import com.google.android.gms.common.ConnectionResult;
@@ -79,7 +74,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.content_weather_reports);
 
-        mAdapter = new WeatherAdapter(dailyReport);
+        mAdapter = new WeatherAdapter(dailyReport, this);
 
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false);
@@ -91,7 +86,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-
     }
 
     public void downloadWeatherData(Location location){
@@ -222,74 +216,5 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     public void onConnectionSuspended(int i) {
 
-    }
-
-    public class WeatherAdapter extends RecyclerView.Adapter<WeatherReportViewHolder>{
-
-        private ArrayList<DailyWeatherReport> mDailyWeatherReport;
-
-        public WeatherAdapter(ArrayList<DailyWeatherReport> mDailyWeatherReport) {
-            this.mDailyWeatherReport = mDailyWeatherReport;
-        }
-
-        @Override
-        public void onBindViewHolder(WeatherReportViewHolder holder, int position) {
-            DailyWeatherReport report = mDailyWeatherReport.get(position);
-            holder.updateUI(report);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mDailyWeatherReport.size();
-        }
-
-        @Override
-        public WeatherReportViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View card = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_weather,parent,false);
-            return new WeatherReportViewHolder(card);
-
-        }
-    }
-
-    public class WeatherReportViewHolder extends RecyclerView.ViewHolder{
-        private ImageView weatherIcon;
-        private TextView weatherDate;
-        private TextView weatherDescription;
-        private TextView tempHigh;
-        private TextView tempLow;
-
-        public WeatherReportViewHolder(View itemView) {
-            super(itemView);
-
-            weatherIcon = (ImageView)itemView.findViewById(R.id.weather_icon);
-            weatherDate = (TextView)itemView.findViewById(R.id.weather_day);
-            weatherDescription = (TextView)itemView.findViewById(R.id.weather_description);
-            tempHigh = (TextView)itemView.findViewById(R.id.weather_temp_high);
-            tempLow = (TextView)itemView.findViewById(R.id.weather_temp_low);
-        }
-
-        public void updateUI(DailyWeatherReport report){
-
-            weatherDate.setText(report.getDate());
-            weatherDescription.setText(report.getWeatherType());
-            tempHigh.setText(Integer.toString(report.getMaxTemp()) + "°");
-            tempLow.setText(Integer.toString(report.getMinTemp()) + "°");
-
-            switch (report.getWeatherType()){
-                case DailyWeatherReport.WEATHER_TYPE_CLOUDS:
-                    weatherIcon.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_mini));
-                    break;
-                case DailyWeatherReport.WEATHER_TYPE_RAIN:
-                    weatherIcon.setImageDrawable(getResources().getDrawable(R.drawable.rainy_mini));
-                    break;
-                case DailyWeatherReport.WEATHER_TYPE_SNOW:
-                    weatherIcon.setImageDrawable(getResources().getDrawable(R.drawable.snow_mini));
-                    break;
-                default:
-                    weatherIcon.setImageDrawable(getResources().getDrawable(R.drawable.sunny_mini));
-            }
-
-
-        }
     }
 }
